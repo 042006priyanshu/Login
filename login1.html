@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Auth System</title>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a0ca3;
+            --secondary: #3f37c9;
+            --danger: #f72585;
+            --success: #4cc9f0;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --border-radius: 0.3rem;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 450px;
+            background: white;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .container:hover {
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: var(--primary-dark);
+            font-weight: 700;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ced4da;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: 0;
+            box-shadow: 0 0 0 0.2rem rgba(67, 97, 238, 0.25);
+        }
+        
+        .btn {
+            display: inline-block;
+            font-weight: 400;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: middle;
+            user-select: none;
+            border: 1px solid transparent;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            border-radius: var(--border-radius);
+            transition: all 0.15s ease-in-out;
+            cursor: pointer;
+            width: 100%;
+        }
+        
+        .btn-primary {
+            color: white;
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+        
+        .btn-danger {
+            color: white;
+            background-color: var(--danger);
+            border-color: var(--danger);
+        }
+        
+        .btn-danger:hover {
+            background-color: #e31768;
+            border-color: #e31768;
+        }
+        
+        .footer-text {
+            margin-top: 1.5rem;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        .footer-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .footer-link:hover {
+            text-decoration: underline;
+        }
+        
+        .alert {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: var(--border-radius);
+            display: none;
+        }
+        
+        .alert-danger {
+            color: #721c24;
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+        
+        .password-toggle {
+            position: relative;
+        }
+        
+        .password-toggle-icon {
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #6c757d;
+        }
+        
+        .password-toggle-icon:hover {
+            color: var(--primary);
+        }
+        
+        .page {
+            display: none;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        @media (max-width: 576px) {
+            .container {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Login Page -->
+        <div id="login-page" class="page active">
+            <h1>Welcome Back</h1>
+            <div id="login-error" class="alert alert-danger"></div>
+            
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="login-email" class="form-label">Email Address</label>
+                    <input type="email" class="form-control" id="login-email" required placeholder="Enter your email">
+                </div>
+                
+                <div class="form-group password-toggle">
+                    <label for="login-password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="login-password" required placeholder="Enter your password">
+                    <span class="password-toggle-icon" onclick="togglePassword('login-password')">👁️</span>
+                </div>
+                
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Login</button>
+                </div>
+            </form>
+            
+            <div class="footer-text">
+                Don't have an account? <a href="#" class="footer-link" onclick="showPage('register-page')">Register</a>
+            </div>
+        </div>
+        
+        <!-- Register Page -->
+        <div id="register-page" class="page">
+            <h1>Create Account</h1>
+            <div id="register-error" class="alert alert-danger"></div>
+            <div id="register-success" class="alert alert-success"></div>
+            
+            <form id="register-form">
+                <div class="form-group">
+                    <label for="register-name" class="form-label">Full Name</label>
+                    <input type="text" class="form-control" id="register-name" required placeholder="Enter your full name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="register-email" class="form-label">Email Address</label>
+                    <input type="email" class="form-control" id="register-email" required placeholder="Enter your email">
+                </div>
+                
+                <div class="form-group password-toggle">
+                    <label for="register-password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="register-password" required placeholder="Create a password">
+                    <span class="password-toggle-icon" onclick="togglePassword('register-password')">👁️</span>
+                </div>
+                
+                <div class="form-group password-toggle">
+                    <label for="register-confirm-password" class="form-label">Confirm Password</label>
+                    <input type="password" class="form-control" id="register-confirm-password" required placeholder="Confirm your password">
+                    <span class="password-toggle-icon" onclick="togglePassword('register-confirm-password')">👁️</span>
+                </div>
+                
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Register</button>
+                </div>
+            </form>
+            
+            <div class="footer-text">
+                Already have an account? <a href="#" class="footer-link" onclick="showPage('login-page')">Login</a>
+            </div>
+        </div>
+        
+        <!-- Dashboard Page -->
+        <div id="dashboard-page" class="page">
+            <div class="dashboard">
+                <div class="user-info">
+                    <h1 id="welcome-message">Welcome, User</h1>
+                    <p>You are now logged in to your account.</p>
+                </div>
+                
+                <button id="logout-btn" class="btn btn-danger">Logout</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Simulated database
+        const usersDB = JSON.parse(localStorage.getItem('users')) || [];
+        
+        // DOM elements
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const logoutBtn = document.getElementById('logout-btn');
+        const loginError = document.getElementById('login-error');
+        const registerError = document.getElementById('register-error');
+        const registerSuccess = document.getElementById('register-success');
+        const welcomeMessage = document.getElementById('welcome-message');
+        
+        // Check if user is already logged in
+        document.addEventListener('DOMContentLoaded', () => {
+            const loggedInUser = localStorage.getItem('loggedInUser');
+            if (loggedInUser) {
+                const user = JSON.parse(loggedInUser);
+                showDashboard(user);
+            }
+        });
+        
+        // Login form submission
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            loginError.style.display = 'none';
+            
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            // Find user in the database
+            const user = usersDB.find(u => u.email === email);
+            
+            if (!user) {
+                showError(loginError, 'User not found. Please check your email or register.');
+                return;
+            }
+            
+            // In a real app, we would verify the hashed password
+            if (user.password !== password) {
+                showError(loginError, 'Incorrect password. Please try again.');
+                return;
+            }
+            
+            // Success - login user
+            localStorage.setItem('loggedInUser', JSON.stringify(user));
+            
+            // Redirect to index1.html after successful login
+            window.location.href = 'index1.html';
+        });
+        
+        // Register form submission
+        registerForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            registerError.style.display = 'none';
+            registerSuccess.style.display = 'none';
+            
+            const name = document.getElementById('register-name').value;
+            const email = document.getElementById('register-email').value;
+            const password = document.getElementById('register-password').value;
+            const confirmPassword = document.getElementById('register-confirm-password').value;
+            
+            // Validation
+            if (password !== confirmPassword) {
+                showError(registerError, 'Passwords do not match.');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showError(registerError, 'Password must be at least 6 characters.');
+                return;
+            }
+            
+            // Check if user already exists
+            if (usersDB.find(u => u.email === email)) {
+                showError(registerError, 'Email already registered. Please login.');
+                return;
+            }
+            
+            // Create new user
+            const newUser = {
+                id: Date.now().toString(),
+                name,
+                email,
+                password // In a real app, this would be hashed
+            };
+            
+            // Add to database
+            usersDB.push(newUser);
+            localStorage.setItem('users', JSON.stringify(usersDB));
+            
+            // Show success message
+            registerSuccess.textContent = 'Registration successful! You can now login.';
+            registerSuccess.style.display = 'block';
+            
+            // Clear form
+            registerForm.reset();
+            
+            // Auto scroll to top in case on mobile
+            window.scrollTo(0, 0);
+            
+            // Show login page after short delay
+            setTimeout(() => {
+                showPage('login-page');
+            }, 1500);
+        });
+        
+        // Logout
+        logoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('loggedInUser');
+            showPage('login-page');
+            loginForm.reset();
+        });
+        
+        // Helper functions
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+        }
+        
+        function showDashboard(user) {
+            welcomeMessage.textContent = `Welcome, ${user.name}`;
+            showPage('dashboard-page');
+        }
+        
+        function showError(element, message) {
+            element.textContent = message;
+            element.style.display = 'block';
+            window.scrollTo(0, 0);
+        }
+        
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+    </script>
+</body>
+</html>
